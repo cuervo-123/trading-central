@@ -90,7 +90,7 @@
     </div>
 
     <input type="text" id="buscador" placeholder="Buscar canal de la lista..." />
-    <input type="file" id="cargarArchivo" accept=".json,.m3u8,.m3u" />
+    <input type="file" id="cargarArchivo" accept=".m3u" />
     <button onclick="cargarCanalesInternos()">🎞️ Cargar Canales Internos</button>
     <button onclick="mostrarFavoritos()">📁 Ver Favoritos</button>
     <button onclick="exportarFavoritos()">💾 Exportar Favoritos</button>
@@ -382,8 +382,8 @@
     /* ========= Carga automática de listas ========= */
     Promise.all([
       fetch("update2.m3u").then(res => res.text()),
-      fetch("colombia.m3u").then(res => res.text()),
-      fetch("brazil.m3u").then(res => res.text())
+      fetch("xumo.m3u").then(res => res.text()),
+      fetch("xiaomi.m3u").then(res => res.text())
     ])
     .then(([data1, data2, data3]) => {
       const canales = [...parseM3U(data1), ...parseM3U(data2), ...parseM3U(data3)];

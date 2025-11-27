@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>THE APPTV CENTRAL — Multi Monitor</title>
 
-  <!-- Config CSE: render explícito y callback cuando cargue -->
+  <!-- Config CSE -->
   <script>
     window.__gcse = {
       parsetags: 'explicit',
@@ -20,56 +20,190 @@
       }
     };
   </script>
-  <!-- Google Programmable Search (UNA sola vez) -->
   <script async src="https://cse.google.com/cse.js?cx=04f5ff6986fe641ad"></script>
-
-  <!-- HLS -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
+  <!-- ======== TECH BLUE STYLE ======== -->
   <style>
-    :root { --azul:#5892bd; }
-    body { background-color: #868980; color: #3a4e6e; font-family: sans-serif; margin: 0; padding: 0; }
+    :root {
+      --bg: #050a12;
+      --bg-soft: #0b1224;
+      --card: #0f1b33;
+      --accent: #1f8bff;
+      --accent-glow: #4ac3ff;
+      --text: #eaf4ff;
+      --text-dim: #93a4c4;
+      --border: #1b2b4a;
+      --radius: 12px;
+      --shadow: 0 0 15px rgba(31,139,255,0.25);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(circle at top left, #081021 0%, #040814 100%);
+      color: var(--text);
+    }
     header, main, footer { padding: 1rem; }
 
+    header {
+      background: linear-gradient(180deg, #0d1528 0%, #0a0f20 100%);
+      box-shadow: var(--shadow);
+      border-bottom: 1px solid var(--border);
+      border-radius: 0 0 var(--radius) var(--radius);
+    }
+    h1 {
+      color: var(--accent-glow);
+      text-shadow: 0 0 12px rgba(74,195,255,0.5);
+      margin: 0 0 .75rem;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+    }
+
+    /* Carrusel */
     #carrusel-wrapper { position: relative; }
-    #canales-inferiores { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 0.5rem; padding: 1rem; background: #1e1f33; scroll-behavior: smooth; }
-    .canal { background: #80f077; border-radius: 10px; padding: 0.5rem 1rem; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-    .canal:hover { background: #d4d4ea; }
-    .flecha-carrusel { position: absolute; top: 50%; transform: translateY(-50%); font-size: 2rem; color: white; background: rgba(0, 0, 0, 0.5); border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; z-index: 10; }
+    #canales-inferiores {
+      display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 0.7rem;
+      padding: 1rem; background: var(--card); border-radius: var(--radius);
+      box-shadow: inset 0 0 10px rgba(31,139,255,0.12); scroll-behavior: smooth;
+    }
+    .canal {
+      background: var(--accent); color: #fff; border-radius: var(--radius);
+      padding: 0.5rem 1rem; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: all 0.25s ease;
+    }
+    .canal:hover { background: var(--accent-glow); box-shadow: 0 0 10px rgba(74,195,255,0.6); transform: translateY(-1px); }
+    .flecha-carrusel {
+      position: absolute; top: 50%; transform: translateY(-50%); font-size: 1.4rem; color: var(--accent-glow);
+      background: rgba(0,0,0,0.5); border: 2px solid var(--accent); border-radius: 50%;
+      width: 42px; height: 42px; cursor: pointer; z-index: 10; transition: all 0.3s ease; display: grid; place-items: center;
+    }
+    .flecha-carrusel:hover { background: var(--accent); color:#fff; box-shadow: 0 0 10px rgba(74,195,255,.5); }
     .flecha-izquierda { left: 5px; } .flecha-derecha { right: 5px; }
 
-    .player-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
-    .player-container { position: relative; width: 100%; height: 55vh; background: #fff; overflow: hidden; display:flex; flex-direction:column; border-radius: 8px; }
-    video, .player-container iframe { width: 100%; height: 100%; object-fit: cover; }
+    /* Inputs y botones top */
+    #youtube-controls { gap: .5rem; margin-top: 1rem; display:flex; flex-wrap:wrap; }
+    #youtube-controls input, #buscador, #cargarArchivo {
+      background: #0d182f; color: var(--text); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 0.5rem; transition: border-color 0.2s;
+    }
+    #youtube-controls input:focus, #buscador:focus { border-color: var(--accent-glow); outline: none; }
 
-    .panel-header { display:flex; justify-content:space-between; align-items:center; background:var(--azul); color:#fff; padding:6px 10px; }
+    button {
+      padding: 0.45rem 0.8rem; background: var(--accent); border: none;
+      border-radius: var(--radius); color: white; cursor: pointer; font-weight: 600;
+      letter-spacing: .3px; transition: all 0.25s ease;
+    }
+    button:hover { background: var(--accent-glow); box-shadow: 0 0 10px rgba(74,195,255,0.6); transform: translateY(-1px); }
+
+    /* Grid de monitores */
+    .player-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1rem; margin-bottom: 1rem;
+    }
+    .player-container {
+      position: relative; width: 100%; height: 55vh; background: var(--card); overflow: hidden;
+      display:flex; flex-direction:column; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border);
+    }
+    video, .player-container iframe { width: 100%; height: 100%; object-fit: cover; border: none; }
+
+    /* Encabezado del panel por monitor */
+    .panel-header {
+      display:flex; justify-content:space-between; align-items:center;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent-glow) 100%);
+      color:#fff; padding:6px 10px; font-weight:600;
+    }
     .panel-header .left { display:flex; align-items:center; gap:8px; }
     .panel-header .right { display:flex; gap:6px; }
-    .panel-header button { background:#fff; color:#000; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; }
-    .panel-header button:hover { background:#eee; }
+    .panel-header button { background:#fff; color:#0a0f20; border:none; padding:4px 10px; border-radius:6px; cursor:pointer; transition: all .2s; }
+    .panel-header button:hover { background: var(--accent-glow); color:#fff; }
 
-    .gcse-searchresults-only, .gcse-results-host { flex:1; overflow:auto; }
-
-    .botones-panel { margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
-    button { padding: 0.4rem 0.7rem; background:var(--azul); border: none; border-radius: 6px; color: white; cursor: pointer; }
-    button:hover { filter: brightness(0.95); }
-    .site-select { max-width: 420px; width: 100%; min-height: 112px; }
+    /* Controles */
+    .botones-panel { margin-top: 0.5rem; display: grid; grid-template-columns: 1fr; gap: .6rem; align-items: flex-start; }
     .site-controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-
+    .site-controls label { color: var(--text-dim); }
     .tabs { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0; }
-    .tab { padding:6px 10px; border:1px solid #444; border-radius:6px; cursor:pointer; background:#2b2b2b; color:#fff; }
-    .tab.active { background:#333; }
+    .tab { padding:6px 10px; border:1px solid var(--border); border-radius:6px; cursor:pointer; background:#101d3b; color:#fff; transition:all .2s; }
+    .tab.active, .tab:hover { background: var(--accent); color:#fff; box-shadow: 0 0 8px rgba(74,195,255,0.4); }
     .grid-split { display:grid; gap:8px; width:100%; height:100%; }
 
+    /* Fullscreen */
     .fullscreen-iframe { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 9999 !important; background: black !important; }
-    .fullscreen-iframe-button { position: fixed; top: 10px; right: 10px; z-index: 10000; background: #fff; color: #000; border: 2px solid #000; border-radius: 5px; padding: 5px 10px; cursor: pointer; }
+    .fullscreen-iframe-button { position: fixed; top: 10px; right: 10px; z-index: 10000; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); padding: 6px 10px; cursor: pointer; box-shadow: 0 0 10px rgba(74,195,255,.45); }
 
-    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { background: #fff; color:#111; padding: 1rem; border-radius: 10px; width: min(800px, 90vw); max-height: 80vh; overflow: auto; }
+    /* Modales */
+    .modal { position: fixed; inset: 0; background: rgba(0,0,20,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: var(--card); color:#eaf4ff; padding: 1rem; border-radius: 10px; width: min(800px, 90vw); max-height: 80vh; overflow: auto; border: 1px solid var(--border); box-shadow: 0 0 20px rgba(31,139,255,0.3); }
     #listaFavoritos { list-style: none; padding: 0; margin:0; }
-    #listaFavoritos li { padding: 0.5rem; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+    #listaFavoritos li { padding: 0.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 
-    #buscador { width: 100%; padding: 0.5rem; margin: 0.5rem 0 1rem; border: none; border-radius: 5px; }
+    /* Scrollbar */
+    ::-webkit-scrollbar { height: 8px; width: 8px; }
+    ::-webkit-scrollbar-track { background: #0c1328; }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent-glow); }
+
+    /* --- Link Box (Tech Blue) --- */
+    .link-toolbar {
+      display: flex; flex-wrap: wrap; gap: .6rem; align-items: center;
+      background: #0b152b; border: 1px solid var(--border); border-radius: var(--radius);
+      padding: .55rem .6rem;
+    }
+    .link-toolbar input[type="text"]{
+      flex: 1 1 260px; min-width: 200px;
+      background: #0d182f; color: var(--text);
+      border: 1px solid var(--border); border-radius: 10px; padding: .45rem .6rem;
+    }
+    .link-toolbar input[type="text"]::placeholder{ color: #6f82a9; }
+    .link-toolbar .spacer{ flex: 999 1 0; } /* empuja acciones a la derecha */
+    .compact-toggle { display:flex; align-items:center; gap:.45rem; color: var(--text-dim); }
+    .compact-toggle input { width: 18px; height: 18px; }
+
+    .link-actions { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; color: var(--text-dim); }
+    .link-actions button { padding: .35rem .6rem; font-weight: 600; }
+
+    .link-box {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: .6rem; width: 100%;
+    }
+    .link-box.compact { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: .5rem; }
+
+    .link-card {
+      display: grid; grid-template-columns: 36px 1fr auto;
+      align-items: center; gap: .6rem; padding: .6rem .7rem;
+      background: #0d182f; border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: 0 0 8px rgba(31,139,255,.12);
+      transition: transform .15s ease, box-shadow .2s ease, border-color .2s, background .2s;
+      cursor: grab;
+    }
+    .link-box.compact .link-card { grid-template-columns: 28px 1fr auto; padding: .45rem .55rem; }
+    .link-card:hover { transform: translateY(-1px); box-shadow: 0 0 12px rgba(74,195,255,.28); border-color: var(--accent); }
+    .link-card.selected { background: linear-gradient(180deg, #0f1f3d 0%, #0d182f 100%); border-color: var(--accent); box-shadow: 0 0 14px rgba(74,195,255,.35); }
+    .link-card.dragging { opacity: .6; cursor: grabbing; }
+    .link-card.drop-before::before,
+    .link-card.drop-after::after { content: ""; position: absolute; left: 0; right: 0; height: 0; border-top: 2px dashed var(--accent-glow); }
+    .link-card.drop-before { position: relative; }
+    .link-card.drop-before::before { top: -4px; }
+    .link-card.drop-after { position: relative; }
+    .link-card.drop-after::after { bottom: -4px; }
+
+    .link-fav { width: 28px; height: 28px; border-radius: 6px; background: #0b152b; display: grid; place-items: center; overflow: hidden; }
+    .link-fav img { width: 20px; height: 20px; }
+    .link-box.compact .link-fav { width: 24px; height: 24px; }
+    .link-box.compact .link-fav img { width: 18px; height: 18px; }
+
+    .link-info { display: flex; flex-direction: column; min-width: 0; }
+    .link-title { color: var(--text); font-weight: 600; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .link-host { color: var(--text-dim); font-size: .78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .link-box.compact .link-title { font-size: .88rem; }
+    .link-box.compact .link-host { font-size: .72rem; }
+
+    .link-ctrl { display: flex; align-items: center; gap: .4rem; }
+    .link-ctrl input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+
+    /* Oculta el <select multiple> tradicional */
+    .site-select { display: none !important; }
   </style>
 </head>
 <body>
@@ -82,8 +216,8 @@
       <button class="flecha-carrusel flecha-derecha" onclick="scrollCarrusel(1)">➡️</button>
     </div>
 
-    <div id="youtube-controls" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-      <input id="youtubeSearch" type="text" placeholder="Buscar en YouTube..." style="flex: 1; padding: 0.5rem;" />
+    <div id="youtube-controls" style="display: flex;">
+      <input id="youtubeSearch" type="text" placeholder="Buscar en YouTube..." style="flex: 1;" />
       <button onclick="buscarYT()">🔍 Buscar</button>
       <button onclick="toggleRotacion()">⏸️ Pausar</button>
       <button onclick="siguienteVideo()">⏭️ Siguiente</button>
@@ -117,6 +251,23 @@
 
         <div class="botones-panel">
           <select id="siteSelect0" multiple size="5" class="site-select"></select>
+
+          <!-- NUEVA TOOLBAR -->
+          <div class="link-toolbar">
+            <input type="text" id="lbFilter0" placeholder="Filtrar sitios (nombre, host o URL)..." oninput="lbApplyFilter(0)">
+            <div class="spacer"></div>
+            <label class="compact-toggle">
+              <input type="checkbox" id="lbCompact0" onchange="lbToggleCompact(0)"> Compact
+            </label>
+            <div class="link-actions">
+              <button type="button" onclick="lbSelectAll(0)">Seleccionar todos</button>
+              <button type="button" onclick="lbInvert(0)">Invertir</button>
+              <button type="button" onclick="lbClear(0)">Limpiar</button>
+            </div>
+          </div>
+
+          <div id="linkBox0" class="link-box"></div>
+
           <div class="site-controls">
             <label style="display:flex;align-items:center;gap:6px;">
               <input type="checkbox" id="splitMode0" checked> Vista dividida
@@ -127,7 +278,7 @@
           </div>
         </div>
         <div class="botones-panel">
-          <input type="text" id="symbolInput0" placeholder="Símbolo (ej: EURUSD)" style="flex:1; padding:0.5rem;" />
+          <input type="text" id="symbolInput0" placeholder="Símbolo (ej: EURUSD)" style="padding:0.5rem;" />
           <button onclick="cargarGraficoTV(0)">📈 Gráfico</button>
           <button onclick="quitarGraficoTV(0)">🗑️ Quitar</button>
         </div>
@@ -147,6 +298,22 @@
 
         <div class="botones-panel">
           <select id="siteSelect1" multiple size="5" class="site-select"></select>
+
+          <div class="link-toolbar">
+            <input type="text" id="lbFilter1" placeholder="Filtrar sitios (nombre, host o URL)..." oninput="lbApplyFilter(1)">
+            <div class="spacer"></div>
+            <label class="compact-toggle">
+              <input type="checkbox" id="lbCompact1" onchange="lbToggleCompact(1)"> Compact
+            </label>
+            <div class="link-actions">
+              <button type="button" onclick="lbSelectAll(1)">Seleccionar todos</button>
+              <button type="button" onclick="lbInvert(1)">Invertir</button>
+              <button type="button" onclick="lbClear(1)">Limpiar</button>
+            </div>
+          </div>
+
+          <div id="linkBox1" class="link-box"></div>
+
           <div class="site-controls">
             <label style="display:flex;align-items:center;gap:6px;">
               <input type="checkbox" id="splitMode1" checked> Vista dividida
@@ -157,7 +324,7 @@
           </div>
         </div>
         <div class="botones-panel">
-          <input type="text" id="symbolInput1" placeholder="Símbolo (ej: EURUSD)" style="flex:1; padding:0.5rem;" />
+          <input type="text" id="symbolInput1" placeholder="Símbolo (ej: EURUSD)" style="padding:0.5rem;" />
           <button onclick="cargarGraficoTV(1)">📈 Gráfico</button>
           <button onclick="quitarGraficoTV(1)">🗑️ Quitar</button>
         </div>
@@ -177,6 +344,22 @@
 
         <div class="botones-panel">
           <select id="siteSelect2" multiple size="5" class="site-select"></select>
+
+          <div class="link-toolbar">
+            <input type="text" id="lbFilter2" placeholder="Filtrar sitios (nombre, host o URL)..." oninput="lbApplyFilter(2)">
+            <div class="spacer"></div>
+            <label class="compact-toggle">
+              <input type="checkbox" id="lbCompact2" onchange="lbToggleCompact(2)"> Compact
+            </label>
+            <div class="link-actions">
+              <button type="button" onclick="lbSelectAll(2)">Seleccionar todos</button>
+              <button type="button" onclick="lbInvert(2)">Invertir</button>
+              <button type="button" onclick="lbClear(2)">Limpiar</button>
+            </div>
+          </div>
+
+          <div id="linkBox2" class="link-box"></div>
+
           <div class="site-controls">
             <label style="display:flex;align-items:center;gap:6px;">
               <input type="checkbox" id="splitMode2" checked> Vista dividida
@@ -187,7 +370,7 @@
           </div>
         </div>
         <div class="botones-panel">
-          <input type="text" id="symbolInput2" placeholder="Símbolo (ej: EURUSD)" style="flex:1; padding:0.5rem;" />
+          <input type="text" id="symbolInput2" placeholder="Símbolo (ej: EURUSD)" style="padding:0.5rem;" />
           <button onclick="cargarGraficoTV(2)">📈 Gráfico</button>
           <button onclick="quitarGraficoTV(2)">🗑️ Quitar</button>
         </div>
@@ -207,6 +390,22 @@
 
         <div class="botones-panel">
           <select id="siteSelect3" multiple size="5" class="site-select"></select>
+
+          <div class="link-toolbar">
+            <input type="text" id="lbFilter3" placeholder="Filtrar sitios (nombre, host o URL)..." oninput="lbApplyFilter(3)">
+            <div class="spacer"></div>
+            <label class="compact-toggle">
+              <input type="checkbox" id="lbCompact3" onchange="lbToggleCompact(3)"> Compact
+            </label>
+            <div class="link-actions">
+              <button type="button" onclick="lbSelectAll(3)">Seleccionar todos</button>
+              <button type="button" onclick="lbInvert(3)">Invertir</button>
+              <button type="button" onclick="lbClear(3)">Limpiar</button>
+            </div>
+          </div>
+
+          <div id="linkBox3" class="link-box"></div>
+
           <div class="site-controls">
             <label style="display:flex;align-items:center;gap:6px;">
               <input type="checkbox" id="splitMode3" checked> Vista dividida
@@ -217,7 +416,7 @@
           </div>
         </div>
         <div class="botones-panel">
-          <input type="text" id="symbolInput3" placeholder="Símbolo (ej: EURUSD)" style="flex:1; padding:0.5rem;" />
+          <input type="text" id="symbolInput3" placeholder="Símbolo (ej: EURUSD)" style="padding:0.5rem;" />
           <button onclick="cargarGraficoTV(3)">📈 Gráfico</button>
           <button onclick="quitarGraficoTV(3)">🗑️ Quitar</button>
         </div>
@@ -255,30 +454,24 @@
   <script>
     /* ====== CSE programático ====== */
     function renderCSEPair(gname) {
-      // Renderiza el searchbox
       google.search.cse.element.render({
         div: 'searchbox-' + gname,
         tag: 'searchbox-only',
         gname: gname,
         attributes: { enableAutoComplete: true, autoCompleteMaxCompletions: 8 }
       });
-      // Renderiza los resultados
       google.search.cse.element.render({
         div: 'results-' + gname,
         tag: 'searchresults-only',
         gname: gname
       });
     }
-
     function resetAndRenderCSE(gname) {
-      // Vacía contenedores y renderiza de nuevo (esto limpia input + resultados)
       const sb = document.getElementById('searchbox-' + gname);
       const rs = document.getElementById('results-' + gname);
       if (sb) sb.innerHTML = '';
       if (rs) rs.innerHTML = '';
-      if (window.__CSE_READY__) {
-        renderCSEPair(gname);
-      }
+      if (window.__CSE_READY__) renderCSEPair(gname);
     }
 
     /* ========= CARRUSEL ========= */
@@ -353,8 +546,6 @@
           <div id="searchbox-m${pantallaIndex+1}"></div>
           <div id="results-m${pantallaIndex+1}" class="gcse-results-host"></div>`;
         reproducirCanal(canalSeleccionado, pantallaIndex);
-
-        // Re-render CSE para ese monitor (por si lo reemplazamos con video)
         resetAndRenderCSE('m' + (pantallaIndex+1));
       }
       cerrarModalPantalla();
@@ -430,8 +621,6 @@
         <div id="searchbox-m${idx+1}"></div>
         <div id="results-m${idx+1}" class="gcse-results-host"></div>`;
       container.appendChild(iframe);
-
-      // Re-render CSE en ese monitor para no perder su buscador
       resetAndRenderCSE('m' + (idx+1));
     }
 
@@ -443,7 +632,7 @@
     function toggleRotacion() { isPaused = !isPaused; alert(isPaused ? "⏸️ Rotación pausada." : "▶️ Rotación reanudada."); }
     function siguienteVideo() { currentVideoIndex = (currentVideoIndex + 1) % youtubeResults.length; reproducirVideoActual(); }
 
-    /* ========= Sitios favoritos / gráficos por monitor ========= */
+    /* ========= Sitios favoritos ========= */
     const FAVORITE_SITES = [
       { label: "Central App's", url: "https://cuervo-123.github.io/GLOBALTV4YOUPLUS/" },
       { label: "Global country Tv App", url: "https://cuervo-123.github.io/tv4you/" },
@@ -453,10 +642,11 @@
       { label: "x app", url: "https://wap.tizam.club/fil_my_dlya_vzroslyh/podrostki_18/ryzhen_kie_ochen_seksual_ny_5/" },
       { label: "W3U Database", url: "https://cuervo-123.github.io/w3u-reader-iptv-plus/" },
       { label: "Multi Functions pro", url: "https://cuervo-123.github.io/mi-tv-station-v-10.1/" },
-      { label: "weltrade", url: "https://www.weltrade.com/tools/charts/" },
-      
+      { label: "weltrade", url: "https://www.weltrade.com/tools/charts/" }
     ];
     const LS_KEY = (idx) => `siteSelection:${idx}`;
+    const ORDER_KEY = (idx) => `siteOrder:${idx}`;
+    const COMPACT_KEY = (idx) => `siteCompact:${idx}`;
     const normalizeUrl = (u) => {
       if (!u) return "";
       let url = u.trim();
@@ -464,19 +654,236 @@
       return url;
     };
 
-    function initSitePicker(index) {
+    /* ====== Link Box helpers ====== */
+    function faviconURL(u){
+      try { return 'https://www.google.com/s2/favicons?sz=64&domain=' + (new URL(u)).hostname; }
+      catch { return 'https://www.google.com/s2/favicons?sz=64&domain=example.com'; }
+    }
+    function hostOf(u){
+      try { return (new URL(u)).hostname; } catch { return u; }
+    }
+
+    function getSavedOrder(index){
+      try { return JSON.parse(localStorage.getItem(ORDER_KEY(index)) || "[]"); } catch { return []; }
+    }
+    function saveOrder(index, arr){
+      try { localStorage.setItem(ORDER_KEY(index), JSON.stringify(arr)); } catch {}
+    }
+    function getCompact(index){
+      try { return JSON.parse(localStorage.getItem(COMPACT_KEY(index)) || "false"); } catch { return false; }
+    }
+    function setCompact(index, val){
+      try { localStorage.setItem(COMPACT_KEY(index), JSON.stringify(!!val)); } catch {}
+    }
+
+    function renderLinkBox(index){
       const select = document.getElementById(`siteSelect${index}`);
-      if (!select) return;
-      select.innerHTML = FAVORITE_SITES.map(s =>
-        `<option value="${s.url}">${s.label} — ${s.url}</option>`
-      ).join("");
-      const saved = JSON.parse(localStorage.getItem(LS_KEY(index)) || "[]");
-      Array.from(select.options).forEach(opt => {
-        if (saved.includes(opt.value)) opt.selected = true;
+      const box = document.getElementById(`linkBox${index}`);
+      if(!select || !box) return;
+
+      const selected = new Set(Array.from(select.selectedOptions).map(o=>o.value));
+      // Opciones base
+      let opts = Array.from(select.options).map(o => ({
+        url: o.value,
+        label: (o.text || o.value).split(' — ')[0] || o.value,
+        host: hostOf(o.value)
+      }));
+      // Reordenar según orden guardado
+      const savedOrder = getSavedOrder(index);
+      if (savedOrder.length) {
+        const orderMap = new Map(savedOrder.map((u,i)=>[u,i]));
+        opts.sort((a,b) => (orderMap.has(a.url)?orderMap.get(a.url):1e9) - (orderMap.has(b.url)?orderMap.get(b.url):1e9));
+      }
+
+      box.innerHTML = opts.map(({url,label,host})=>{
+        const isSel = selected.has(url);
+        return `
+          <div class="link-card ${isSel?'selected':''}" data-url="${url}" data-label="${label.toLowerCase()}" data-host="${host.toLowerCase()}" data-full="${url.toLowerCase()}" draggable="true">
+            <div class="link-fav"><img src="${faviconURL(url)}" alt=""></div>
+            <div class="link-info">
+              <div class="link-title" title="${label}">${label}</div>
+              <div class="link-host" title="${url}">${host}</div>
+            </div>
+            <div class="link-ctrl">
+              <input type="checkbox" ${isSel?'checked':''}>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Compact UI
+      const compact = getCompact(index);
+      const compactChk = document.getElementById(`lbCompact${index}`);
+      if (compactChk) compactChk.checked = compact;
+      box.classList.toggle('compact', compact);
+
+      // Interacciones (selección + drag)
+      enableLinkCardInteractions(index);
+      lbEnableDrag(index);
+
+      // Aplicar filtro actual si hay
+      lbApplyFilter(index);
+    }
+
+    function lbSyncSelectFromBox(index){
+      const select = document.getElementById(`siteSelect${index}`);
+      const box = document.getElementById(`linkBox${index}`);
+      if(!select || !box) return;
+      const chosen = new Set(
+        Array.from(box.querySelectorAll('.link-card.selected')).map(c => c.getAttribute('data-url'))
+      );
+      Array.from(select.options).forEach(o => o.selected = chosen.has(o.value));
+    }
+
+    function enableLinkCardInteractions(index){
+      const box = document.getElementById(`linkBox${index}`);
+      if(!box) return;
+      box.querySelectorAll('.link-card').forEach(card=>{
+        card.addEventListener('click', (e)=>{
+          if (e.target && e.target.matches('input[type="checkbox"]')) return;
+          card.classList.toggle('selected');
+          const chk = card.querySelector('input[type="checkbox"]');
+          if (chk) chk.checked = card.classList.contains('selected');
+          lbSyncSelectFromBox(index);
+        });
+        const chk = card.querySelector('input[type="checkbox"]');
+        if (chk) chk.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          card.classList.toggle('selected', chk.checked);
+          lbSyncSelectFromBox(index);
+        });
       });
     }
 
+    /* ====== Drag & Drop ====== */
+    function lbEnableDrag(index){
+      const box = document.getElementById(`linkBox${index}`);
+      if(!box) return;
+      let dragEl = null;
+
+      box.querySelectorAll('.link-card').forEach(card=>{
+        card.addEventListener('dragstart', (e)=>{
+          dragEl = card;
+          card.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+          try { e.dataTransfer.setData('text/plain', card.getAttribute('data-url')); } catch {}
+        });
+        card.addEventListener('dragend', ()=>{
+          if(dragEl){ dragEl.classList.remove('dragging'); dragEl = null; }
+          saveCurrentOrder(index);
+        });
+
+        card.addEventListener('dragover', (e)=>{
+          e.preventDefault();
+          if(!dragEl || dragEl === card) return;
+          const rect = card.getBoundingClientRect();
+          const before = (e.clientY - rect.top) < rect.height / 2;
+          card.classList.toggle('drop-before', before);
+          card.classList.toggle('drop-after', !before);
+        });
+        card.addEventListener('dragleave', ()=>{
+          card.classList.remove('drop-before','drop-after');
+        });
+        card.addEventListener('drop', (e)=>{
+          e.preventDefault();
+          if(!dragEl || dragEl === card) return;
+          const before = card.classList.contains('drop-before');
+          card.classList.remove('drop-before','drop-after');
+          if (before) {
+            box.insertBefore(dragEl, card);
+          } else {
+            box.insertBefore(dragEl, card.nextSibling);
+          }
+          saveCurrentOrder(index);
+        });
+      });
+
+      function saveCurrentOrder(idx){
+        const order = Array.from(box.querySelectorAll('.link-card')).map(c=>c.getAttribute('data-url'));
+        saveOrder(idx, order);
+      }
+    }
+
+    /* ====== Toolbar: Filtro & Compact ====== */
+    function lbApplyFilter(index){
+      const box = document.getElementById(`linkBox${index}`);
+      const input = document.getElementById(`lbFilter${index}`);
+      if(!box || !input) return;
+      const q = (input.value || '').trim().toLowerCase();
+      const cards = box.querySelectorAll('.link-card');
+      if(!q){
+        cards.forEach(c => c.style.display = '');
+        return;
+      }
+      cards.forEach(c=>{
+        const label = c.getAttribute('data-label') || '';
+        const host  = c.getAttribute('data-host')  || '';
+        const full  = c.getAttribute('data-full')  || '';
+        const show = label.includes(q) || host.includes(q) || full.includes(q);
+        c.style.display = show ? '' : 'none';
+      });
+    }
+
+    function lbToggleCompact(index){
+      const box = document.getElementById(`linkBox${index}`);
+      const chk = document.getElementById(`lbCompact${index}`);
+      if(!box || !chk) return;
+      const isOn = !!chk.checked;
+      box.classList.toggle('compact', isOn);
+      setCompact(index, isOn);
+    }
+
+    /* ====== Acciones selección ====== */
+    function lbSelectAll(index){
+      const box = document.getElementById(`linkBox${index}`); if(!box) return;
+      box.querySelectorAll('.link-card').forEach(c=>{
+        c.classList.add('selected');
+        const chk = c.querySelector('input[type="checkbox"]'); if(chk) chk.checked = true;
+      });
+      lbSyncSelectFromBox(index);
+    }
+    function lbInvert(index){
+      const box = document.getElementById(`linkBox${index}`); if(!box) return;
+      box.querySelectorAll('.link-card').forEach(c=>{
+        const sel = c.classList.toggle('selected');
+        const chk = c.querySelector('input[type="checkbox"]'); if(chk) chk.checked = sel;
+      });
+      lbSyncSelectFromBox(index);
+    }
+    function lbClear(index){
+      const box = document.getElementById(`linkBox${index}`); if(!box) return;
+      box.querySelectorAll('.link-card').forEach(c=>{
+        c.classList.remove('selected');
+        const chk = c.querySelector('input[type="checkbox"]'); if(chk) chk.checked = false;
+      });
+      lbSyncSelectFromBox(index);
+    }
+
+    /* ====== Picker y acciones (integrado con Link Box + Orden + Compact) ====== */
+    function initSitePicker(index) {
+      const select = document.getElementById(`siteSelect${index}`);
+      if (!select) return;
+
+      // Rellena el select oculto con FAVORITE_SITES
+      select.innerHTML = FAVORITE_SITES.map(s =>
+        `<option value="${s.url}">${s.label} — ${s.url}</option>`
+      ).join("");
+
+      // Recupera guardado (selección)
+      const savedSel = JSON.parse(localStorage.getItem(LS_KEY(index)) || "[]");
+      Array.from(select.options).forEach(opt => { opt.selected = savedSel.includes(opt.value); });
+
+      // Compact inicial
+      const compact = getCompact(index);
+      const compactChk = document.getElementById(`lbCompact${index}`);
+      if (compactChk) compactChk.checked = compact;
+
+      // Render Link Box con orden + compact + filtro
+      renderLinkBox(index);
+    }
+
     function guardarSeleccionSitios(index) {
+      lbSyncSelectFromBox(index);
       const select = document.getElementById(`siteSelect${index}`);
       const seleccion = Array.from(select.selectedOptions).map(o => o.value);
       localStorage.setItem(LS_KEY(index), JSON.stringify(seleccion));
@@ -484,9 +891,18 @@
     }
 
     function limpiarSeleccionSitios(index) {
+      lbClear(index);
       const select = document.getElementById(`siteSelect${index}`);
       Array.from(select.options).forEach(o => (o.selected = false));
       localStorage.removeItem(LS_KEY(index));
+    }
+
+    function getUrlsFromLinkBoxInOrder(index){
+      const box = document.getElementById(`linkBox${index}`);
+      if(!box) return [];
+      // Solo seleccionados, en el orden visual actual (aunque estén ocultos por filtro, si están seleccionados, cuentan)
+      const cards = Array.from(box.querySelectorAll('.link-card.selected'));
+      return cards.map(c => normalizeUrl(c.getAttribute('data-url'))).filter(Boolean);
     }
 
     function renderIframesInContainer(index, urls) {
@@ -498,9 +914,7 @@
 
       if (split) {
         const n = cleanUrls.length;
-        let cols = 2;
-        if (n === 3) cols = 3;
-        if (n >= 4) cols = 3;
+        let cols = 2; if (n === 3) cols = 3; if (n >= 4) cols = 3;
         const gridStyle = `grid-template-columns: repeat(${cols}, 1fr); grid-auto-rows: minmax(200px, 1fr);`;
         container.innerHTML = `
           <div class="panel-header">
@@ -558,29 +972,25 @@
           <div id="results-m${index+1}" class="gcse-results-host"></div>
         `;
       }
-
-      // Re-render CSE en ese monitor para que siga estando disponible
       resetAndRenderCSE('m' + (index+1));
     }
 
     function activarTab(index, i) {
-      const tabsWrap = document.getElementById(`tabs-${index}`);
-      if (!tabsWrap) return;
+      const tabsWrap = document.getElementById(`tabs-${index}`); if (!tabsWrap) return;
       tabsWrap.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
       const target = tabsWrap.querySelector(`.tab[data-tab='${i}']`);
       if (target) target.classList.add("active");
-      const container = document.querySelector(`.player-container[data-index='${index}']`);
-      if (!container) return;
+      const container = document.querySelector(`.player-container[data-index='${index}']`); if (!container) return;
       container.querySelectorAll("iframe[id^='iframe-']").forEach((f, idx) => {
         f.style.display = (idx === i) ? "block" : "none";
       });
     }
 
     function cargarGraficoTV(index) {
-      const select = document.getElementById(`siteSelect${index}`);
-      const seleccion = select ? Array.from(select.selectedOptions).map(o => o.value) : [];
-      const urls = (seleccion.length > 0) ? seleccion : ["https://cuervo-123.github.io/GLOBALTV4YOUPLUS/"];
-      renderIframesInContainer(index, urls);
+      // Usa seleccionados (en orden visual actual). El filtro no afecta la apertura.
+      const urls = getUrlsFromLinkBoxInOrder(index);
+      const finalUrls = urls.length ? urls : ["https://cuervo-123.github.io/GLOBALTV4YOUPLUS/"];
+      renderIframesInContainer(index, finalUrls);
     }
 
     function quitarGraficoTV(index) {
@@ -623,7 +1033,7 @@
       [0,1,2,3].forEach(initSitePicker);
     });
 
-    /* ========= Favoritos (stubs mínimos) ========= */
+    /* ========= Favoritos (stubs) ========= */
     function mostrarFavoritos() { document.getElementById("modalFavoritos").style.display = "flex"; }
     function cerrarModal() { document.getElementById("modalFavoritos").style.display = "none"; }
     function exportarFavoritos() { alert("Exportar favoritos (mantén tu implementación actual aquí)."); }
@@ -636,7 +1046,6 @@
 
     /* ========= LIMPIAR BÚSQUEDA ========= */
     function limpiarBusqueda(gname) {
-      // 1) API oficial (si existe)
       try {
         if (window.__CSE_READY__ && google?.search?.cse?.element) {
           const el = google.search.cse.element.getElement(gname);
@@ -646,7 +1055,6 @@
       } catch(e) {
         console.warn('No se pudo usar API CSE para limpiar', gname, e);
       }
-      // 2) Re-render obligatorio: limpia input + resultados
       resetAndRenderCSE(gname);
     }
     function limpiarResultados() {
